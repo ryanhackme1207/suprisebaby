@@ -31,7 +31,7 @@ const ITEM_TYPES = [
 // 倒计时逻辑 (保持不变)
 const getTargetTime = () => {
     // 改成了当前时间，立即可玩
-    return new Date('2026-02-27T05:53:00+08:00');
+    return new Date('2026-02-27T05:56:00+08:00');
 };
 
 let targetTime = getTargetTime();
@@ -123,8 +123,9 @@ function setupEventListeners() {
         if (!isPlaying || isPaused) return;
         const rect = canvas.getBoundingClientRect();
         const scaleX = CANVAS_WIDTH / rect.width;
-        basketX = ((e.clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
-        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
+        // 增加 1.5 倍灵敏度
+        let targetX = ((e.clientX - rect.left) * scaleX * 1.5) - BASKET_WIDTH / 2;
+        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, targetX));
 
         if (Math.random() > 0.92) createSparkle(e.clientX, e.clientY);
     });
@@ -152,8 +153,9 @@ function setupEventListeners() {
         e.preventDefault();
         const rect = canvas.getBoundingClientRect();
         const scaleX = CANVAS_WIDTH / rect.width;
-        basketX = ((e.touches[0].clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
-        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
+        // 增加 1.5 倍灵敏度
+        let targetX = ((e.touches[0].clientX - rect.left) * scaleX * 1.5) - BASKET_WIDTH / 2;
+        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, targetX));
     }, { passive: false });
 
     // 点击或触摸直接移动篮子以降低难度
@@ -161,16 +163,18 @@ function setupEventListeners() {
         if (!isPlaying || isPaused) return;
         const rect = canvas.getBoundingClientRect();
         const scaleX = CANVAS_WIDTH / rect.width;
-        basketX = ((e.touches[0].clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
-        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
+        // 增加 1.5 倍灵敏度
+        let targetX = ((e.touches[0].clientX - rect.left) * scaleX * 1.5) - BASKET_WIDTH / 2;
+        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, targetX));
     }, { passive: true });
 
     canvas.addEventListener('mousedown', (e) => {
         if (!isPlaying || isPaused) return;
         const rect = canvas.getBoundingClientRect();
         const scaleX = CANVAS_WIDTH / rect.width;
-        basketX = ((e.clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
-        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
+        // 增加 1.5 倍灵敏度
+        let targetX = ((e.clientX - rect.left) * scaleX * 1.5) - BASKET_WIDTH / 2;
+        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, targetX));
     });
 }
 
