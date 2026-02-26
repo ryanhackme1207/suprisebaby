@@ -122,7 +122,8 @@ function setupEventListeners() {
     canvas.addEventListener('mousemove', (e) => {
         if (!isPlaying || isPaused) return;
         const rect = canvas.getBoundingClientRect();
-        basketX = (e.clientX - rect.left) - BASKET_WIDTH / 2;
+        const scaleX = CANVAS_WIDTH / rect.width;
+        basketX = ((e.clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
         basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
 
         if (Math.random() > 0.92) createSparkle(e.clientX, e.clientY);
@@ -150,9 +151,27 @@ function setupEventListeners() {
         if (!isPlaying || isPaused) return;
         e.preventDefault();
         const rect = canvas.getBoundingClientRect();
-        basketX = (e.touches[0].clientX - rect.left) - BASKET_WIDTH / 2;
+        const scaleX = CANVAS_WIDTH / rect.width;
+        basketX = ((e.touches[0].clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
         basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
     }, { passive: false });
+
+    // 点击或触摸直接移动篮子以降低难度
+    canvas.addEventListener('touchstart', (e) => {
+        if (!isPlaying || isPaused) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = CANVAS_WIDTH / rect.width;
+        basketX = ((e.touches[0].clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
+        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
+    }, { passive: true });
+
+    canvas.addEventListener('mousedown', (e) => {
+        if (!isPlaying || isPaused) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = CANVAS_WIDTH / rect.width;
+        basketX = ((e.clientX - rect.left) * scaleX) - BASKET_WIDTH / 2;
+        basketX = Math.max(0, Math.min(CANVAS_WIDTH - BASKET_WIDTH, basketX));
+    });
 }
 
 function startGame() {
