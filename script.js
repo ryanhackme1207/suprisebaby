@@ -30,8 +30,8 @@ const ITEM_TYPES = [
 
 // 倒计时逻辑 (保持不变)
 const getTargetTime = () => {
-    // 正式时间设定： 2026年2月27日 下午 12点 (马来西亚时间)
-    return new Date('2026-02-27T12:00:00+08:00');
+    // 改成了当前时间，立即可玩
+    return new Date('2026-02-27T05:53:00+08:00');
 };
 
 let targetTime = getTargetTime();
