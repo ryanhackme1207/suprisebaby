@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>老婆专属惊喜</title>
+    <script>
+        // 每次进入主页都重置解锁状态，防止之前测试的记录导致直接进入
+        localStorage.removeItem('surpriseUnlocked');
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- 深夜美梦 - 玫瑰花瓣雨背景 -->
+    <div class="petal-rain-container">
+        <div class="petal-rain" id="petalRain"></div>
+    </div>
+    <!-- 极光星云迷雾层 -->
+    <div class="nebula-mist"></div>
+    <div class="luxury-overlay"></div>
+    <div class="hearts-container" id="floatingHearts"></div>
+
+    <!-- 宇宙粒子开场动画层 -->
+    <div id="introOverlay" class="intro-overlay">
+        <canvas id="cosmosCanvas" class="intro-canvas"></canvas>
+        <div id="m1" class="intro-msg">老婆考完试了<br>✨ 恭喜你 ✨</div>
+        <div id="m2" class="intro-msg intro-msg-sm">不管发生什么，好好的休息<br>享受今天的惊喜吧 💖</div>
+        <div id="m3" class="intro-msg">我爱你，老婆 ❤️</div>
+    </div>
+
+    <main class="sanctuary-container" id="mainGameContainer"
+        style="opacity: 0; transform: scale(0.95); pointer-events: none; transition: all 2.5s cubic-bezier(0.19, 1, 0.22, 1);">
+        <!-- SHARD 1: TITLE & INTRO -->
+        <section class="shard header-shard">
+            <h1 class="ethereal-title">老婆来玩游戏吧</h1>
+            <p class="ethereal-subtitle">老婆辛苦你了这个月，我爱你好好放松吧</p>
+            <div class="vertical-label left">SANCTUARY</div>
+        </section>
+
+        <!-- SHARD 2: THE CHRONOS (COUNTDOWN) -->
+        <section class="shard countdown-shard">
+            <div class="glass-shard">
+                <div class="shard-label">Arrival in</div>
+                <div class="countdown-time" id="countdownTime">00:00:00</div>
+                <div class="progress-info">Resonance: <span id="levelProgress">0/3</span></div>
+            </div>
+        </section>
+
+        <!-- SHARD 3: THE GAME VOID -->
+        <section class="shard game-shard">
+            <div class="canvas-shutter">
+                <canvas id="gameCanvas" width="800" height="700"></canvas>
+            </div>
+
+            <!-- Side Stats (Vertical) -->
+            <div class="stats-shards">
+                <div class="stat-item">
+                    <span class="stat-label">LVL</span>
+                    <span class="stat-value" id="level">1</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">SCR</span>
+                    <span class="stat-value" id="score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">TGT</span>
+                    <span class="stat-value" id="targetScore">100</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">LVS</span>
+                    <span class="stat-value" id="lives">3</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SHARD 4: COMMANDS -->
+        <section class="shard control-shard">
+            <div class="control-grid">
+                <button class="shard-btn" id="pauseBtn">⏸️ PAUSE</button>
+                <button class="shard-btn" id="restartBtn">🔄 RESET</button>
+                <button class="shard-btn" id="soundBtn">🔊 AUDIO</button>
+            </div>
+        </section>
+
+        <!-- SHARD 5: THE ALTAR (SURPRISE) -->
+        <section class="shard altar-shard">
+            <button class="altar-btn disabled" id="surpriseBtn" disabled>
+                <span class="altar-glow"></span>
+                <span class="altar-text">UNLOCK SURPRISE</span>
+            </button>
+            <p class="altar-hint" id="surpriseHint">Awaiting Sacred Alignment</p>
+        </section>
+    </main>
+
+    <!-- 教程弹窗 (独立层) -->
+    <div class="sanctuary-modal" id="tutorialModal" style="display: flex;">
+        <div class="modal-shard glass-shard">
+            <button class="close-shard" id="closeTutorial">&times;</button>
+            <h2 class="modal-title">Love Protocol</h2>
+            <div class="tutorial-grid">
+                <div class="tut-item"><span>🧺</span> 移动篮子，接住落下的心</div>
+                <div class="tut-item"><span>💖</span> 收集粉色爱心和红色玫瑰</div>
+                <div class="tut-item"><span>🌟</span> 总共有三次失误机会</div>
+                <div class="tut-item"><span>🎯</span> 通关三关解锁最终圣器</div>
+            </div>
+            <button class="sacred-btn" id="startGameBtn">BEGIN JOURNEY</button>
+        </div>
+    </div>
+
+    <!-- 胜负弹窗 -->
+    <div class="sanctuary-modal" id="winModal">
+        <div class="modal-shard glass-shard">
+            <h2 class="modal-title">RESONANCE REACHED</h2>
+            <p class="shard-score">Score: <span id="winScore">0</span></p>
+            <button class="sacred-btn" id="nextLevelBtn">ASCEND →</button>
+            <button class="sacred-btn secondary hidden" id="playMoreBtn">LINGER</button>
+        </div>
+    </div>
+
+    <div class="sanctuary-modal" id="loseModal">
+        <div class="modal-shard glass-shard">
+            <button class="close-shard" id="closeLoseModal">&times;</button>
+            <h2 class="modal-title">ECHO DISSOLVED</h2>
+            <button class="sacred-btn" id="retryBtn">TRY AGAIN</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- 测试用重置功能 (双击右下角的小爱心可以重置所有进度) -->
+    <div onclick="if(confirm('确定要重置所有游戏进度吗？项目测试完毕后建议删除此功能。')) { localStorage.clear(); location.reload(); }"
+        style="position: fixed; bottom: 10px; right: 10px; opacity: 0.1; cursor: pointer; font-size: 10px; z-index: 10000;"
+        title="重置进度">❤️</div>
+</body>
+
+</html>

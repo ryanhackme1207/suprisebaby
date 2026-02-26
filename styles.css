@@ -1,0 +1,571 @@
+:root {
+    --amoled-black: #000000;
+    --rose-gold: #E5C3C3;
+    --pearl-white: #fdfcfc;
+    --iridescent-1: rgba(229, 195, 195, 0.15);
+    --iridescent-2: rgba(255, 77, 109, 0.1);
+    --glass-border: rgba(229, 195, 195, 0.2);
+    --text-main: #FFFFFF;
+    --text-muted: rgba(255, 255, 255, 0.5);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    min-height: 100vh;
+    background-color: var(--amoled-black);
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-main);
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+/* 极光星云背景 */
+.nebula-mist {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(229, 195, 195, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 77, 109, 0.05) 0%, transparent 40%);
+    filter: blur(80px);
+    animation: nebulaFloat 20s ease-in-out infinite alternate;
+}
+
+@keyframes nebulaFloat {
+    from {
+        transform: scale(1) translate(0, 0);
+    }
+
+    to {
+        transform: scale(1.2) translate(5%, 5%);
+    }
+}
+
+.petal-rain-container {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+}
+
+.petal {
+    position: absolute;
+    font-size: 18px;
+    opacity: 0.3;
+    animation: petalFalling 12s linear infinite;
+}
+
+@keyframes petalFalling {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.4;
+    }
+
+    90% {
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 圣境容器 - 解构布局 - 扩容版 */
+.sanctuary-container {
+    width: 100%;
+    max-width: 600px;
+    /* 从 450px 增加到 600px 以适应大网格 */
+    padding: 30px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    z-index: 1;
+}
+
+/* 通用碎片样式 */
+.shard {
+    position: relative;
+    width: 100%;
+    animation: shardFloat 6s ease-in-out infinite;
+}
+
+@keyframes shardFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0.5deg);
+    }
+
+    50% {
+        transform: translateY(-10px) rotate(-0.5deg);
+    }
+}
+
+.glass-shard {
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.02) 50%,
+            rgba(229, 195, 195, 0.05) 100%);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 标题碎片 */
+.header-shard {
+    text-align: left;
+    padding-left: 10px;
+}
+
+.ethereal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 0.9;
+    color: var(--rose-gold);
+}
+
+.ethereal-title i {
+    font-style: italic;
+    font-weight: 400;
+    opacity: 0.6;
+}
+
+.ethereal-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    margin-top: 15px;
+    color: var(--text-muted);
+}
+
+.vertical-label {
+    position: absolute;
+    font-size: 0.6rem;
+    letter-spacing: 6px;
+    color: var(--rose-gold);
+    opacity: 0.4;
+    writing-mode: vertical-rl;
+    top: 0;
+}
+
+.vertical-label.left {
+    left: -10px;
+}
+
+/* 倒计时碎片 - 珠光感 */
+.countdown-shard .glass-shard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(229, 195, 195, 0.1), transparent);
+    animation: iridescentShift 8s linear infinite;
+}
+
+@keyframes iridescentShift {
+    0% {
+        transform: translateX(-100%) skewX(-15deg);
+    }
+
+    100% {
+        transform: translateX(200%) skewX(-15deg);
+    }
+}
+
+.shard-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--rose-gold);
+    margin-bottom: 10px;
+}
+
+.countdown-time {
+    font-size: 3.5rem;
+    font-weight: 100;
+    letter-spacing: 2px;
+}
+
+.progress-info {
+    font-size: 0.75rem;
+    margin-top: 10px;
+    color: var(--text-muted);
+}
+
+/* 游戏核心碎片 */
+.game-shard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.canvas-shutter {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 25px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 8 / 7;
+    /* 适配 800x700 的大网格 */
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+
+.stats-shards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    min-width: 60px;
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.55rem;
+    color: var(--rose-gold);
+    margin-bottom: 2px;
+    opacity: 0.7;
+}
+
+.stat-value {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* 控制器按钮 */
+.control-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.shard-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.shard-btn:active {
+    transform: scale(0.95);
+    background: var(--rose-gold);
+    color: #000;
+}
+
+/* 圣坛按钮 - 终极仪式感 */
+.altar-shard {
+    padding-bottom: 40px;
+}
+
+.altar-btn {
+    width: 100%;
+    padding: 25px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #FF4D6D 0%, #C9184A 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(255, 77, 109, 0.3);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.altar-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.altar-btn:not(.disabled):hover .altar-glow {
+    opacity: 1;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 0.1;
+    }
+}
+
+.altar-btn.disabled {
+    background: #111;
+    color: #444;
+    box-shadow: none;
+    border: 1px solid #222;
+}
+
+.altar-hint {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* 圣境弹窗 */
+.sanctuary-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-shard {
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--rose-gold);
+    margin-bottom: 30px;
+}
+
+.tutorial-grid {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.tut-item {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tut-item span {
+    font-size: 1.5rem;
+}
+
+.sacred-btn {
+    width: 100%;
+    padding: 20px;
+    border-radius: 40px;
+    border: none;
+    background: var(--rose-gold);
+    color: #000;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+}
+
+.sacred-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--rose-gold);
+    color: var(--rose-gold);
+    margin-top: 10px;
+}
+
+.close-shard {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--rose-gold);
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 现代仪式感开场动画样式 (Modern Canvas Intro Overlay) */
+.intro-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #000;
+    /* 极致黑夜 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+    transition: opacity 2s ease, transform 2s ease;
+}
+
+.intro-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000;
+}
+
+/* 宇宙开场动画文字 */
+.intro-msg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10002;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.4rem, 6vw, 2.2rem);
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.6;
+    letter-spacing: 2px;
+    opacity: 0;
+    pointer-events: none;
+    padding: 0 28px;
+    text-shadow: 0 0 30px rgba(255, 180, 200, 0.6);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+    width: 90%;
+    max-width: 480px;
+}
+
+.intro-msg.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+}
+
+.intro-msg-sm {
+    font-family: 'Outfit', sans-serif;
+    font-style: normal;
+    font-size: clamp(0.9rem, 3.5vw, 1.3rem);
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: rgba(255, 200, 210, 0.85);
+}
+
+/* 封面闪白 */
+.supernova-flash {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, #fff 0%, #E5C3C3 40%, #000 100%);
+    z-index: 20000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Parent becomes visible and children animate in */
+.modern-text.active {
+    opacity: 1;
+}
+
+.modern-text.exit {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+.glitch-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    filter: blur(10px);
+}
+
+/* 现代文字浮现动画 */
+.modern-text.active .glitch-word {
+    animation: cinematicReveal 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+.modern-text.exit .glitch-word {
+    animation: cinematicVanish 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes cinematicReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        filter: blur(10px);
+        letter-spacing: 15px;
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+        letter-spacing: 5px;
+    }
+}
+
+@keyframes cinematicVanish {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-20px) scale(1.05);
+        filter: blur(5px);
+    }
+}
+
+/* 白光爆破特效 */
+.supernova-flash {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    z-index: 20000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1);
+}

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>嘿嘿嘿...</title>
+    <script>
+        if (localStorage.getItem('surpriseUnlocked') !== 'true') {
+            window.location.replace('index.html');
+        }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Outfit:wght@100;300;400&display=swap"
+        rel="stylesheet">
+    <script src="media/photos.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050005;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            touch-action: none;
+        }
+
+        /* ---- PRANK SCREEN ---- */
+        #prankScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            background: #050005;
+            padding: 40px 24px;
+        }
+
+        .prank-emoji {
+            font-size: clamp(3rem, 12vw, 5rem);
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: scale(1)
+            }
+
+            to {
+                transform: scale(1.15) rotate(8deg)
+            }
+        }
+
+        .prank-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(1.4rem, 5.5vw, 2.2rem);
+            color: #FF4D6D;
+            text-align: center;
+            line-height: 1.5;
+            text-shadow: 0 0 30px rgba(255, 77, 109, 0.6);
+        }
+
+        .prank-sub {
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            color: rgba(255, 200, 210, 0.7);
+            letter-spacing: 2px;
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #FF4D6D, #c90056);
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+            letter-spacing: 2px;
+            padding: 14px 40px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 77, 109, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: pulseBtn 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseBtn {
+
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(255, 77, 109, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 50px rgba(255, 77, 109, 0.9);
+            }
+        }
+
+        .start-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ---- MAIN EXPERIENCE ---- */
+        #mainExp {
+            position: fixed;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+        }
+
+        /* Photo slideshow as full background */
+        #slideshow {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: none;
+            overflow: hidden;
+        }
+
+        /* Blurred bg so no black bars for landscape photos */
+        .slide .blur-bg {
+            position: absolute;
+            inset: -20px;
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.5) saturate(1.4);
+            transform: scale(1.1);
+        }
+
+        /* The actual photo — contained so full image is visible */
+        .slide .photo-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide.exiting {
+            opacity: 0;
+        }
+
+        /* Dark overlay on photos */
+        .photo-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(to bottom,
+                    rgba(0, 0, 0, 0.65) 0%,
+                    rgba(0, 0, 0, 0.3) 40%,
+                    rgba(0, 0, 0, 0.55) 75%,
+                    rgba(0, 0, 0, 0.85) 100%);
+        }
+
+        /* Top: title + progress */
+        #topBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            padding: 20px 20px 0;
+            text-align: center;
+        }
+
+        .song-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(1rem, 4vw, 1.4rem);
+            color: rgba(255, 200, 210, 0.9);
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 77, 109, 0.5);
+        }
+
+        /* Timeline bar */
+        #timeline {
+            width: 100%;
+            height: 3px;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        #timelineFill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FF4D6D, #f7b2c2);
+            border-radius: 2px;
+            transition: width 0.5s linear;
+        }
+
+        /* Scrollable lyrics panel */
+        #lyricsBox {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            height: 38vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 20px 40px;
+            -webkit-overflow-scrolling: touch;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 15%, rgba(0, 0, 0, 0.82) 100%);
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        #lyricsBox::-webkit-scrollbar {
+            display: none;
+        }
+
+        #lyricsBox {
+            scrollbar-width: none;
+        }
+
+        .lyric-line {
+            display: block;
+            font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+            line-height: 2;
+            letter-spacing: 1px;
+            padding: 4px 0;
+            transition: all 0.5s ease;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .lyric-line.current {
+            color: #fff;
+            font-size: clamp(1rem, 4.2vw, 1.4rem);
+            font-weight: 400;
+            text-shadow: 0 0 20px rgba(255, 77, 109, 0.9), 0 0 40px rgba(255, 77, 109, 0.5);
+            transform: scale(1.06);
+        }
+
+        /* Spacer so first/last lyric can be centred */
+        .lyric-spacer {
+            display: block;
+            height: 12vh;
+        }
+
+        /* Skip to surprise btn */
+        #skipBtn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            transition: all 0.2s;
+        }
+
+        #skipBtn:hover {
+            color: #fff;
+            background: rgba(255, 77, 109, 0.3);
+            border-color: rgba(255, 77, 109, 0.4);
+        }
+
+        /* Transition flash */
+        #flash {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+        }
+
+        /* Photo counter */
+        #photoCount {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 20;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Beat pulse effect */
+        @keyframes beatPulse {
+            0% {
+                transform: scale(1.04);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1.04);
+            }
+        }
+
+        .beat {
+            animation: beatPulse 0.4s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PRANK SCREEN -->
+    <div id="prankScreen">
+        <div class="prank-emoji">😏</div>
+        <div class="prank-title">嘿嘿嘿，老婆<br>你以为这样简单就有惊喜吗？</div>
+        <div class="prank-sub">
+            别那么快...<br>
+            先来回忆一下<br>
+            我们甜甜的恋爱吧 🥰
+        </div>
+        <button class="start-btn" id="startBtn">好吧... 继续 ▶</button>
+    </div>
+
+    <!-- MAIN EXPERIENCE -->
+    <div id="mainExp">
+        <div id="slideshow"></div>
+        <div class="photo-overlay"></div>
+        <div id="topBar">
+            <div class="song-title">🎵 唯一回应 · 送给你</div>
+            <div id="timeline">
+                <div id="timelineFill"></div>
+            </div>
+        </div>
+        <div id="photoCount"></div>
+
+        <div id="lyricsBox">
+            <span class="lyric-spacer"></span>
+            <!-- populated by initLyricsList() -->
+            <span class="lyric-spacer"></span>
+        </div>
+    </div>
+
+    <div id="flash"></div>
+    <audio id="audio" src="media/唯一回应.mp3" preload="auto"></audio>
+
+    <script>
+        // ===================== LYRICS (with timestamps in seconds) =====================
+        // Song is ~269s. Timestamps are approximate.
+        const lyrics = [
+            { t: 0, text: '🎵 唯一回应' },
+            { t: 4, text: 'Yeah, one email changed everything' },
+            { t: 9, text: '只有你，给我的世界通了电' },
+            { t: 16, text: '群发的邮件 像石沉大海般安静' },
+            { t: 22, text: '英文班的疑问 只有你给了回应' },
+            { t: 28, text: '屏幕亮起 跳出你的姓名' },
+            { t: 33, text: '我说Email太费劲 加个WeChat行不行' },
+            { t: 39, text: '换了WhatsApp 开启我们的剧情' },
+            { t: 45, text: '那一秒钟 命中注定按下了刷新' },
+            { t: 52, text: '吸引我的不是美丽侧脸' },
+            { t: 57, text: '而是你内心的温暖世界' },
+            { t: 62, text: '驱散阴霾 终结了我的孤单' },
+            { t: 67, text: '是你给我斗志 让我不再退却' },
+            { t: 74, text: '每一天 睁开眼 必须有你在身边' },
+            { t: 79, text: '习惯这种甜 频率多过吃饭喝水' },
+            { t: 85, text: '我们共享快乐 熬过伤心的夜' },
+            { t: 91, text: '我们的爱 是一部未完结的特写' },
+            { t: 97, text: '哪怕生活残酷 逼着我们走远' },
+            { t: 103, text: '两颗心连着线 跨越几个光年 ✨' },
+            { t: 112, text: '陪伴是最致命的吸引' },
+            { t: 117, text: '你的爱 让我彻底地苏醒' },
+            { t: 122, text: '从那天起 人生轨迹改变了风景' },
+            { t: 128, text: '一起成长 证明了彼此的坚定' },
+            { t: 134, text: '你给了我力量 去对抗现实的风浪' },
+            { t: 141, text: '如果距离是考验 思念就是盾牌' },
+            { t: 147, text: '为你变得更好 守护我们的未来' },
+            { t: 153, text: '在这快节奏的时代' },
+            { t: 157, text: '你的偏爱 真的无可替代 💕' },
+            { t: 164, text: '每一天 睁开眼 必须有你在身边' },
+            { t: 170, text: '习惯这种甜 频率多过吃饭喝水' },
+            { t: 176, text: '我们共享快乐 熬过伤心的夜' },
+            { t: 182, text: '我们的爱 是一部未完结的特写' },
+            { t: 188, text: '哪怕生活残酷 逼着我们走远' },
+            { t: 194, text: '两颗心连着线 跨越几个光年' },
+            { t: 202, text: '你的名字 还在我的置顶' },
+            { t: 208, text: '那封Email 永远记在心里 💌' },
+            { t: 214, text: '从那天起 命中注定' },
+            { t: 220, text: 'Forever you and me ❤️' },
+            { t: 226, text: '你的名字 还在我的置顶' },
+            { t: 232, text: '那封Email 永远记在心里 💌' },
+            { t: 238, text: '从那天起 命中注定' },
+            { t: 244, text: 'Forever you and me ❤️' },
+            { t: 252, text: '...' },
+            { t: 260, text: '❤️ 我爱你，老婆 ❤️' },
+            { t: 269, text: '' },
+        ];
+
+        // ===================== PHOTOS (dynamic from photos.js) =====================
+        let ALL_PHOTOS = window.ALL_PHOTOS_DATA || ["20230501_183202.jpg"];
+
+        let photos = [];
+        let currentSlide = 0;
+        let slideInterval = null;
+        let slideEls = [];
+
+        function loadPhotos() {
+            if (!window.ALL_PHOTOS_DATA || window.ALL_PHOTOS_DATA.length === 0) {
+                console.warn('ALL_PHOTOS_DATA is missing or empty, using fallback.');
+            } else {
+                ALL_PHOTOS = window.ALL_PHOTOS_DATA;
+            }
+            photos = shuffle(ALL_PHOTOS);
+        }
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; }
+            return a;
+        }
+
+        function initSlideshow(songDuration) {
+            const box = document.getElementById('slideshow');
+            box.innerHTML = '';
+            slideEls = [];
+
+            if (photos.length === 0) return;
+
+            // How many slides to show? One per ~4 seconds, but must cover full song.
+            const numSlides = Math.ceil(songDuration / 4);
+            // Pick photos — loop if fewer than needed, but never repeat consecutive
+            const selected = [];
+            for (let i = 0; i < numSlides; i++) selected.push(photos[i % photos.length]);
+
+            selected.forEach((name, i) => {
+                const src = `media/${encodeURIComponent('老婆')}/${encodeURIComponent(name)}`;
+                const div = document.createElement('div');
+                div.className = 'slide' + (i === 0 ? ' active' : '');
+
+                // Blurred background layer
+                const blurBg = document.createElement('div');
+                blurBg.className = 'blur-bg';
+                blurBg.style.backgroundImage = `url('${src}')`;
+
+                // Actual contained image
+                const img = document.createElement('img');
+                img.className = 'photo-img';
+                img.src = src;
+                img.alt = '';
+                img.draggable = false;
+
+                div.appendChild(blurBg);
+                div.appendChild(img);
+                box.appendChild(div);
+                slideEls.push(div);
+            });
+
+            // Schedule each slide
+            const dur = (songDuration / numSlides) * 1000; // ms per slide
+
+            let idx = 0;
+            slideInterval = setInterval(() => {
+                const prev = slideEls[idx];
+                idx = (idx + 1) % slideEls.length;
+                const next = slideEls[idx];
+
+                // Choose random transition
+                applyTransition(prev, next);
+                updatePhotoCount(idx + 1, slideEls.length);
+            }, dur);
+
+            updatePhotoCount(1, slideEls.length);
+        }
+
+        // Beautiful slide transitions
+        const transitions = ['crossfade', 'slideUp', 'slideLeft', 'zoom', 'flash'];
+        function applyTransition(prev, next, type) {
+            const t = type || transitions[Math.floor(Math.random() * transitions.length)];
+            if (t === 'crossfade') {
+                prev.style.transition = 'opacity 1.2s ease';
+                next.style.transition = 'opacity 1.2s ease';
+                prev.classList.remove('active');
+                next.classList.add('active');
+            } else if (t === 'slideUp') {
+                prev.style.transition = 'transform 0.9s cubic-bezier(0.4,0,0.2,1), opacity 0.9s ease';
+                prev.style.transform = 'translateY(-60px) scale(0.95)';
+                prev.style.opacity = '0';
+                next.style.transition = 'transform 0.9s cubic-bezier(0.4,0,0.2,1), opacity 0.9s ease';
+                next.style.transform = 'translateY(60px) scale(0.98)';
+                next.style.opacity = '0';
+                next.classList.add('active');
+                requestAnimationFrame(() => {
+                    next.style.transform = 'translateY(0) scale(1)';
+                    next.style.opacity = '1';
+                });
+                setTimeout(() => {
+                    prev.style.transition = '';
+                    prev.style.transform = '';
+                    prev.style.opacity = '';
+                    prev.classList.remove('active');
+                }, 900);
+            } else if (t === 'slideLeft') {
+                prev.style.transition = 'transform 0.9s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease';
+                prev.style.transform = 'translateX(-80px) scale(0.95)';
+                prev.style.opacity = '0';
+                next.style.opacity = '0';
+                next.style.transform = 'translateX(80px) scale(0.98)';
+                next.style.transition = 'transform 0.9s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease';
+                next.classList.add('active');
+                requestAnimationFrame(() => {
+                    next.style.transform = 'translateX(0) scale(1)';
+                    next.style.opacity = '1';
+                });
+                setTimeout(() => {
+                    prev.style.transition = '';
+                    prev.style.transform = '';
+                    prev.style.opacity = '';
+                    prev.classList.remove('active');
+                }, 900);
+            } else if (t === 'zoom') {
+                next.style.transform = 'scale(1.15)';
+                next.style.opacity = '0';
+                next.style.transition = 'transform 1.2s ease, opacity 0.8s ease';
+                next.classList.add('active');
+                requestAnimationFrame(() => {
+                    next.style.transform = 'scale(1)';
+                    next.style.opacity = '1';
+                });
+                setTimeout(() => {
+                    prev.style.transition = 'opacity 0.4s ease';
+                    prev.style.opacity = '0';
+                    setTimeout(() => { prev.style.transition = ''; prev.style.opacity = ''; prev.classList.remove('active'); }, 400);
+                }, 400);
+            } else { // flash
+                const flash = document.createElement('div');
+                flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:5;opacity:0.7;transition:opacity 0.3s ease;pointer-events:none;';
+                document.body.appendChild(flash);
+                prev.classList.remove('active');
+                next.classList.add('active');
+                setTimeout(() => { flash.style.opacity = '0'; setTimeout(() => flash.remove(), 300); }, 150);
+            }
+        }
+
+        function updatePhotoCount(n, total) {
+            document.getElementById('photoCount').textContent = `${n} / ${total}`;
+        }
+
+        // Build the full lyric list once
+        const lyricEls = [];
+        function initLyricsList() {
+            const box = document.getElementById('lyricsBox');
+            const spacerStart = box.querySelector('.lyric-spacer');
+            lyrics.forEach((l, i) => {
+                if (!l.text) return;
+                const span = document.createElement('span');
+                span.className = 'lyric-line';
+                span.textContent = l.text;
+                box.insertBefore(span, box.lastElementChild); // before end spacer
+                lyricEls[i] = span;
+            });
+        }
+
+        let lyricIndex = -1;
+        let userScrolling = false;
+        let scrollTimeout;
+        document.getElementById('lyricsBox').addEventListener('touchstart', () => {
+            userScrolling = true;
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => { userScrolling = false; }, 3000);
+        }, { passive: true });
+
+        function updateLyrics() {
+            const t = audio.currentTime;
+            let idx = 0;
+            for (let i = 0; i < lyrics.length; i++) {
+                if (t >= lyrics[i].t) idx = i;
+            }
+
+            if (idx !== lyricIndex) {
+                // Remove highlight from previous
+                if (lyricIndex >= 0 && lyricEls[lyricIndex]) {
+                    lyricEls[lyricIndex].classList.remove('current');
+                }
+                lyricIndex = idx;
+                const el = lyricEls[idx];
+                if (el) {
+                    el.classList.add('current');
+                    // Auto-scroll if user is not scrolling
+                    if (!userScrolling) {
+                        const box = document.getElementById('lyricsBox');
+                        const elTop = el.offsetTop - box.offsetTop;
+                        const target = elTop - box.clientHeight / 2 + el.clientHeight / 2;
+                        box.scrollTo({ top: target, behavior: 'smooth' });
+                    }
+                    // Beat pulse
+                    el.classList.remove('beat');
+                    void el.offsetWidth;
+                    el.classList.add('beat');
+                }
+            }
+
+            if (audio.duration) {
+                document.getElementById('timelineFill').style.width = (t / audio.duration * 100) + '%';
+            }
+            if (!audio.ended && !audio.paused) requestAnimationFrame(updateLyrics);
+        }
+
+        audio.addEventListener('ended', () => {
+            clearInterval(slideInterval);
+            setTimeout(goToValentine, 1500);
+        });
+
+        // ===================== FLOW =====================
+        async function startExperience() {
+            document.getElementById('prankScreen').style.display = 'none';
+            document.getElementById('mainExp').style.display = 'flex';
+
+            loadPhotos(); // read from window.ALL_PHOTOS_DATA
+
+            audio.play().catch(e => console.warn('Audio play failed', e));
+
+            // Wait for duration to init slideshow
+            const tryInit = () => {
+                if (audio.duration && audio.duration > 0) {
+                    initSlideshow(audio.duration);
+                    requestAnimationFrame(updateLyrics);
+                } else {
+                    // Fallback: assume 269s
+                    initSlideshow(269);
+                    requestAnimationFrame(updateLyrics);
+                }
+            };
+
+            initLyricsList();
+            audio.addEventListener('loadedmetadata', tryInit, { once: true });
+            if (audio.readyState >= 1) tryInit();
+        }
+
+        document.getElementById('startBtn').addEventListener('click', startExperience);
+
+        function goToValentine() {
+            clearInterval(slideInterval);
+            audio.pause();
+            const flash = document.getElementById('flash');
+            flash.style.opacity = '1';
+            setTimeout(() => window.location.replace('valentine.html'), 1800);
+        }
+        function goToSurprise() { goToValentine(); }
+    </script>
+</body>
+
+</html>
